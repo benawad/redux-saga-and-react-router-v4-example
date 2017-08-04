@@ -1,14 +1,15 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, takeLatest } from 'redux-saga/effects';
 
-function* fetchUser(action) {
-  try {
-    const user = yield call(() => ({}), action.payload.userId);
-    yield put({ type: 'USER_FETCH_SUCCEEDED', user });
-  } catch (e) {
-    yield put({ type: 'USER_FETCH_FAILED', message: e.message });
+import { REQUEST_LOGIN } from './actions';
+import { login } from './api';
+
+function* loginSaga({ payload: { fields, callback } }) {
+  const { isError } = yield call(login, fields);
+  if (!isError) {
+    callback();
   }
 }
 
 export default function* mySaga() {
-  yield takeLatest('USER_FETCH_REQUESTED', fetchUser);
+  yield takeLatest(REQUEST_LOGIN, loginSaga);
 }
